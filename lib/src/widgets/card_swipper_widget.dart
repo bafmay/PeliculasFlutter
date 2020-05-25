@@ -3,46 +3,45 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 
 class CardSwipper extends StatelessWidget {
-
   final List<Pelicula> peliculas;
 
-  CardSwipper({ @required this.peliculas});
+  CardSwipper({@required this.peliculas});
 
   @override
   Widget build(BuildContext context) {
-
     final _screenSize = MediaQuery.of(context).size;
 
     return Container(
-      padding: EdgeInsets.only(top: 10.0),
-      width: double.infinity,
-      height: _screenSize.height * 0.45,
-      child: Swiper(
-        itemWidth: _screenSize.width * 0.5,
-        itemHeight: _screenSize.height * 0.45,
-        layout: SwiperLayout.STACK,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30.0),
-              
-            
-            ),
-            child: ClipRRect(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30.0),
-                child: FadeInImage(
-                  placeholder: AssetImage('assets/img/no-image.jpg'), 
-                  image: NetworkImage(peliculas[index].getPosterImg()),
-                  fit: BoxFit.contain,
+        padding: EdgeInsets.only(top: 10.0),
+        width: double.infinity,
+        height: _screenSize.height * 0.45,
+        child: Swiper(
+            itemWidth: _screenSize.width * 0.5,
+            itemHeight: _screenSize.height * 0.45,
+            layout: SwiperLayout.STACK,
+            itemBuilder: (BuildContext context, int index) {
+              peliculas[index].uniqueId = '${peliculas[index].id}-tarjeta';
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
-              ),
-            )
-          );
-        },
-        autoplay: true,
-        itemCount: peliculas.length
-      )
-    );
+                child: Hero(
+                  tag: peliculas[index].uniqueId,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, 'detalle',arguments: peliculas[index]),
+                      child: FadeInImage(
+                        placeholder: AssetImage('assets/img/no-image.jpg'),
+                        image: NetworkImage(peliculas[index].getPosterImg()),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+            autoplay: true,
+            itemCount: peliculas.length));
   }
 }

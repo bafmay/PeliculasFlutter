@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +11,7 @@ class PeliculaProvider{
   String _url = 'api.themoviedb.org';
   String _language = 'es-ES';
   int _popularesPage = 0;
+  bool _cargando = false;
 
   List<Pelicula> _populares = new List();
 
@@ -38,11 +40,13 @@ class PeliculaProvider{
     
     final peliculas = Peliculas.fromJsonList(decodeData['results']);
 
-    print(peliculas.items[0].title);
     return peliculas.items;
   }
 
   Future<List<Pelicula>> getPopulares() async {
+
+    if(_cargando) return [];
+    _cargando = true;
 
     _popularesPage++;
 
@@ -56,7 +60,31 @@ class PeliculaProvider{
 
     _populares.addAll(rpta);
     popularesSink(_populares);
+    _cargando = false;
     return rpta;
+  }
+
+  Future<List<Actor>> getCast(String peliculaId) async{
+    final url = Uri.https(_url, '3/movie/$peliculaId/credits',{
+      'api_key' : _apikey,
+      'language': _language
+    });
+
+    final resp = await http.get(url);
+    final decodeData = json.decode(resp.body);
+
+    final cast = Cast.fromJsonList(decodeData['cast']);
+    return cast.actores;
+  }
+
+  Future<List<Pelicula>> buscarPelicula(String query) async {
+    final url = Uri.https(_url, '3/search/movie',{
+      'api_key' : _apikey,
+      'language': _language,
+      'query'   : query
+    });
+
+    return await _getPeliculas(url);
   }
 
 }
