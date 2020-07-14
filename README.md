@@ -1,6 +1,7 @@
 # peliculas
 
-A new Flutter project.
+This is a simple example using Futures, web services and BLOC pattern in Flutter.
+
 
 ## Getting Started
 
